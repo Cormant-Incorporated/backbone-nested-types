@@ -1,0 +1,35 @@
+{
+  "name": "backbone-nested-types",
+  "version": "1.0.0",
+  "author": "Cormant, Inc. <info@cormant.biz>",
+  "description": "Provides toJSON(), parse(), and validate() implementations for Backbone Models with nested types",
+  "main": "backbone-nested-types.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/cormant/backbone-nested-types.git"
+  },
+  "keywords": [
+    "backbone",
+    "nested",
+    "types"
+  ],
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/cormant/backbone-nested-types",
+  "private": true,
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "jquery": "^2.1.4",
+    "lodash": "^3.10.1",
+    "requirejs": "^2.1.20",
+    "sinon": "^1.17.1"
+  },
+  "dependencies": {
+    "backbone": "^1.2.3"
+  }
+}
