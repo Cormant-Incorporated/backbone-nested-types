@@ -1,6 +1,6 @@
 # backbone-nested-types
 
-Provides `toJSON()`, `parse()`, and `validate()` implementations for Backbone Models with nested types.
+Backbone Model mixin that provides `toJSON()`, `parse()`, and `validate()` implementations for models with nested types.
 
 Setup:
 
