@@ -2,6 +2,8 @@
 
 Provides `toJSON()`, `parse()`, and `validate()` implementations for Backbone Models with nested types.
 
+[![Build Status](https://travis-ci.org/Cormant-Incorporated/backbone-nested-types.svg?branch=master)](https://travis-ci.org/Cormant-Incorporated/backbone-nested-types)
+
 Setup:
 
 1. Mix this object into a Backbone Model using `Backbone.Model.extend(NestedTypesMixin)`.
