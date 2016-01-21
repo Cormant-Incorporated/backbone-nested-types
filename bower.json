@@ -1,10 +1,10 @@
 {
   "name": "backbone-nested-types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
-    "Cormant, Inc. <info@cormant.biz>"
+    "Cormant, Inc. <sloit@cormant.biz>"
   ],
-  "description": "Provides toJSON(), parse(), and validate() implementations for Backbone Models with nested types",
+  "description": "Backbone Model mixin that provides toJSON(), parse(), and validate() implementations for models with nested types",
   "main": "backbone-nested-types.js",
   "moduleType": [
     "amd"
@@ -15,8 +15,8 @@
       "types"
   ],
   "license": "MIT",
-  "homepage": "https://bitbucket.org/cormant/backbone-nested-types",
-  "private": true,
+  "homepage": "https://github.com/Cormant-Incorporated/backbone-nested-types",
+  "private": false,
   "ignore": [
     "**/.*",
     "bower_components",
