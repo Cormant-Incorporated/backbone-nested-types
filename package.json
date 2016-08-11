@@ -1,6 +1,6 @@
 {
   "name": "backbone-nested-types",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Cormant, Inc. <sloit@cormant.biz>",
   "description": "Backbone Model mixin that provides toJSON(), parse(), and validate() implementations for models with nested types",
   "main": "backbone-nested-types.js",
