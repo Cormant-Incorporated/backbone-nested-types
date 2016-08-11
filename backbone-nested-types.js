@@ -72,6 +72,21 @@
         return Type === AncestorType || Type.prototype instanceof AncestorType;
     };
 
+    // Calls the specified method of the super-type of the given Backbone model. 
+    // Temporarily modifies the `constructor` reference to support nesting.
+    var applySuper = function (model, methodName, args) {
+        // Save a reference to the original constructor, then overwrite it with the 
+        // super constructor so that other mixins can override it in the same way.
+        var originalConstructor = model.constructor;
+        model.constructor = model.constructor.__super__.constructor;
+
+        // Call the mixee's method to support transformations, then fix the constructor reference.
+        var result = originalConstructor.__super__[methodName].apply(model, args);
+        model.constructor = originalConstructor;
+
+        return result;
+    };
+
     return {
 
         // Backbone Overrides
@@ -81,14 +96,8 @@
         // Passes `options` to each nested type constructor.
         // Hint: Pass `parse:true` to recursively instantiate nested types.
         parse: function (attrs, options) {
-            // Save a reference to the original constructor, then overwrite it with the 
-            // super constructor so that other mixins can override `parse()` in the same way.
-            var originalConstructor = this.constructor;
-            this.constructor = this.constructor.__super__.constructor;
-
-            // Call the mixee's `parse()` to support transformations, then fix the constructor reference.
-            attrs = originalConstructor.__super__.parse.apply(this, arguments);
-            this.constructor = originalConstructor;
+            // Call the mixee's `parse()` to support transformations.
+            attrs = applySuper(this, 'parse', arguments);
 
             // Get the current nested types.
             var nestedTypes = _.result(this, 'nestedTypes') || {};
@@ -118,14 +127,8 @@
         // Serializes attributes defined in `nestedTypes` by using their `toJSON()` method, if provided.
         // Passes `options` to each instance nested `toJSON()`.
         toJSON: function (options) {
-            // Save a reference to the original constructor, then overwrite it with the 
-            // super constructor so that other mixins can override `toJSON()` in the same way.
-            var originalConstructor = this.constructor;
-            this.constructor = this.constructor.__super__.constructor;
-
-            // Call the mixee's `toJSON()` to support transformations, then fix the constructor reference.
-            var json = originalConstructor.__super__.toJSON.apply(this, arguments);
-            this.constructor = originalConstructor;
+            // Call the mixee's `toJSON()` to support transformations.
+            var json = applySuper(this, 'toJSON', arguments);
 
             // Get the current nested types.
             var nestedTypes = _.result(this, 'nestedTypes') || {};
@@ -145,15 +148,12 @@
         // Passes `options` to each nested `validate()` call.
         // Pass the option `validateNested: false` to skip validation of nested models.
         validate: function (attrs, options) {
-            // Save a reference to the original constructor, then overwrite it with the 
-            // super constructor so that other mixins can override `validate()` in the same way.
-            var originalConstructor = this.constructor;
-            this.constructor = this.constructor.__super__.constructor;
+            var validationError;
 
-            // Call the mixee's `parse()` to support recursive validation, then fix the constructor reference.
-            var validate = originalConstructor.__super__.validate || _.noop;
-            var validationError = validate.apply(this, arguments);
-            this.constructor = originalConstructor;
+            // Call the mixee's `validate()` to support recursive validation.
+            if (_.has(this.constructor.__super__, 'validate')) {
+                validationError = applySuper(this, 'validate', arguments);
+            }
 
             // Don't validate nested types if `validateNested: false`.
             if (options && options.validateNested === false) {
