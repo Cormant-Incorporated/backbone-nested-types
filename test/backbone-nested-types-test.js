@@ -109,6 +109,27 @@ describe('NestedTypeMixin', function () {
             expect(actual).to.eql({ nested: { foo: 'bar' } });
         });
 
+        it('should serialize model using multiple mixins with toJSON calls', function () {
+            var OtherMixin = {
+                toJSON: function() {
+                    return this.constructor.__super__.toJSON.apply(this, arguments);
+                }
+            };
+
+            var MultipleMixinModel = Backbone.Model.extend({
+                toJSON: function() {
+                    return { foo: 'bar' };
+                }
+            }).extend(OtherMixin).extend(NestedTypeMixin);
+
+            var multipleMixinModel = new MultipleMixinModel();
+
+            // act
+            var actual = multipleMixinModel.toJSON();
+
+            expect(actual).to.eql({ foo: 'bar' });
+        });
+
         it('should serialize nested model when nestedTypes is a function', function() {
             var Model = Backbone.Model.extend({
                 defaults: function() {
@@ -466,6 +487,27 @@ describe('NestedTypeMixin', function () {
             }).to.throw(TypeError);
         });
 
+        it('should parse model using multiple mixins with parse calls', function () {
+            var OtherMixin = {
+                parse: function() {
+                    return this.constructor.__super__.parse.apply(this, arguments);
+                }
+            };
+
+            var MultipleMixinModel = Backbone.Model.extend({
+                parse: function() {
+                    return { foo: 'bar' };
+                }
+            }).extend(OtherMixin).extend(NestedTypeMixin);
+
+            var multipleMixinModel = new MultipleMixinModel();
+
+            // act
+            var actual = multipleMixinModel.parse();
+
+            expect(actual).to.eql({ foo: 'bar' });
+        });
+
         it('should parse nested Backbone collection into an instance of the Collection', function () {
             var Collection = Backbone.Collection.extend({
                 model: Backbone.Model.extend()
@@ -685,6 +727,27 @@ describe('NestedTypeMixin', function () {
             mixedModel.validate();
 
             expect(mixedModel.get('myModel').validate.calledOnce).to.be.true;
+        });
+
+        it('should validate model using multiple mixins with validate calls', function () {
+            var OtherMixin = {
+                validate: function() {
+                    return this.constructor.__super__.validate.apply(this, arguments);
+                }
+            };
+
+            var MultipleMixinModel = Backbone.Model.extend({
+                validate: function() {
+                    return 'success';
+                }
+            }).extend(OtherMixin).extend(NestedTypeMixin);
+
+            var multipleMixinModel = new MultipleMixinModel();
+
+            // act
+            var actual = multipleMixinModel.validate();
+
+            expect(actual).to.eql('success');
         });
 
         it('should not throw error when a nested model does not define validate', function () {
