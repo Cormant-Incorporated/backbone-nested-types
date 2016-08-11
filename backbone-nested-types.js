@@ -81,8 +81,14 @@
         // Passes `options` to each nested type constructor.
         // Hint: Pass `parse:true` to recursively instantiate nested types.
         parse: function (attrs, options) {
-            // Call the mixee's `parse()` first in case some transformations must be applied.
-            attrs = this.constructor.__super__.parse.apply(this, arguments);
+            // Save a reference to the original constructor, then overwrite it with the 
+            // super constructor so that other mixins can override `parse()` in the same way.
+            var originalConstructor = this.constructor;
+            this.constructor = this.constructor.__super__.constructor;
+
+            // Call the mixee's `parse()` to support transformations, then fix the constructor reference.
+            attrs = originalConstructor.__super__.parse.apply(this, arguments);
+            this.constructor = originalConstructor;
 
             // Get the current nested types.
             var nestedTypes = _.result(this, 'nestedTypes') || {};
@@ -112,8 +118,14 @@
         // Serializes attributes defined in `nestedTypes` by using their `toJSON()` method, if provided.
         // Passes `options` to each instance nested `toJSON()`.
         toJSON: function (options) {
-            // Call the mixee's `toJSON()` first in case some transformations must be applied.
-            var json = this.constructor.__super__.toJSON.apply(this, arguments);
+            // Save a reference to the original constructor, then overwrite it with the 
+            // super constructor so that other mixins can override `toJSON()` in the same way.
+            var originalConstructor = this.constructor;
+            this.constructor = this.constructor.__super__.constructor;
+
+            // Call the mixee's `toJSON()` to support transformations, then fix the constructor reference.
+            var json = originalConstructor.__super__.toJSON.apply(this, arguments);
+            this.constructor = originalConstructor;
 
             // Get the current nested types.
             var nestedTypes = _.result(this, 'nestedTypes') || {};
@@ -133,9 +145,15 @@
         // Passes `options` to each nested `validate()` call.
         // Pass the option `validateNested: false` to skip validation of nested models.
         validate: function (attrs, options) {
-            // Calls the mixee's `validate()` first to support recursive validation.
-            var originalValidate = this.constructor.__super__.validate || _.noop,
-                validationError = originalValidate.apply(this, arguments);
+            // Save a reference to the original constructor, then overwrite it with the 
+            // super constructor so that other mixins can override `validate()` in the same way.
+            var originalConstructor = this.constructor;
+            this.constructor = this.constructor.__super__.constructor;
+
+            // Call the mixee's `parse()` to support recursive validation, then fix the constructor reference.
+            var validate = originalConstructor.__super__.validate || _.noop;
+            var validationError = validate.apply(this, arguments);
+            this.constructor = originalConstructor;
 
             // Don't validate nested types if `validateNested: false`.
             if (options && options.validateNested === false) {
