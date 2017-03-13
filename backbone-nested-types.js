@@ -16,6 +16,10 @@
     // Helper Methods
     // --------------
 
+    // Support Lodash v4.
+    var pickBy = _.pickBy || _.pick;
+    var invokeMap = _.invokeMap || _.invoke;
+
     // Returns `true` if `value` can be instantiated as `Type`.
     var canBeInstantiatedAs = function (value, Type) {
         var isCollectionType = isTypeOf(Type, Backbone.Collection);
@@ -25,7 +29,7 @@
     // Returns an object containing only the properties in `attrs` which are
     // instances of their associated type in `nestedTypes`.
     var pickInstances = function (attrs, nestedTypes) {
-        return _.pick(attrs, function (value, name) {
+        return pickBy(attrs, function (value, name) {
             var Type = nestedTypes[name] || function () {};
             return value instanceof Type;
         });
@@ -37,7 +41,7 @@
         var invalidAttr = _.find(attrs, function (value, name) {
             var Type = nestedTypes[name];
             return !canBeInstantiatedAs(value, Type);
-        }, this);
+        }.bind(this));
 
         // Throw exception if any attributes-to-instantiate are invalid.
         if (invalidAttr) {
@@ -62,7 +66,7 @@
             if (!_.isUndefined(result)) {
                 return false;// break out of the loop early
             }
-        }, this);
+        }.bind(this));
 
         return result;
     };
@@ -103,7 +107,7 @@
             var nestedTypes = _.result(this, 'nestedTypes') || {};
 
             // Get the model attributes defined in `nestedTypes`.
-            var nestedAttrs = _.pick(attrs, function (value, name) {
+            var nestedAttrs = pickBy(attrs, function (value, name) {
                 return _.has(nestedTypes, name);
             });
 
@@ -111,9 +115,9 @@
             throwIfInvalid(nestedAttrs, nestedTypes);
 
             // Get the attributes that should be instantiated.
-            var attrsToInstantiate = _.pick(nestedAttrs, function (value, name) {
+            var attrsToInstantiate = pickBy(nestedAttrs, function (value, name) {
                 return canBeInstantiatedAs(value, nestedTypes[name]);
-            }, this);
+            }.bind(this));
 
             // Overwrite current model attributes with instantiated attributes.
             _.each(attrsToInstantiate, function (value, name) {
@@ -173,7 +177,7 @@
             var attrValidations = _.mapValues(attrsToValidate, function (attr) {
                 var validate = attr.validate || _.noop;// `validate` is undefined by default in Backbone.Model
                 return attr instanceof Backbone.Collection ?
-                    attr.invoke('validate', null, options) :
+                    invokeMap(attr.models, 'validate', null, options) :
                     validate.call(attr, null, options);
             });
 
